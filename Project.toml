@@ -1,0 +1,9 @@
+name = "IonisationToy"
+uuid = "e8dfb946-6c49-460b-befd-f40efcdb6e8a"
+authors = ["cookj <James Cook>"]
+version = "0.1.0"
+
+[deps]
+LinearFitXYerrors = "f30eeb3b-f5f0-4632-88ad-a7e11dd3714b"
+LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
