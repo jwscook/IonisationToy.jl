@@ -1,7 +1,7 @@
 using IonisationToy, QuadGK, Test, LinearFitXYerrors
 
 @testset "Integration Test 0" begin
-  L = 1.0
+  L = 1.0 + rand()
   NG = 128
   ni0 = 2 + 3 * rand()
   nn0 = 3 + 2 * rand()
@@ -19,13 +19,11 @@ using IonisationToy, QuadGK, Test, LinearFitXYerrors
                             neutraldensityic=neutraldensityic);
 
   vxic() = randn()
-  initialneutralparticleuniformdensity = nn0
-  neutralparticles = IonisationToy.particlesvector(grid, NP, vxic,
-    initialneutralparticleuniformdensity);
+  neutralparticles = IonisationToy.particlesvector(grid, NP, vxic, nn0)
 
   @test IonisationToy.integralneutraldensity(grid) ≈ 0.0
   IonisationToy.depositongrid!(grid, neutralparticles)
-  @test IonisationToy.integralneutraldensity(grid) ≈ nn0
+  @test IonisationToy.integralneutraldensity(grid) ≈ nn0 * L
 
 
   checkpoints = IonisationToy.simulation(grid, neutralparticles, iters=iters, dt=dt, Riz=Riz)
@@ -38,8 +36,8 @@ using IonisationToy, QuadGK, Test, LinearFitXYerrors
   yn = [IonisationToy.integralneutraldensity(grids[i]) for i in eachindex(t)]
   yp = [IonisationToy.totalweight(particles[i]) for i in eachindex(t)]
 
-  @test all(@. yi + yp ≈ nn0 + ni0)
-  @test all(isapprox(yp, yn, rtol=1e-2))
+  @test all(@. yi + yp ≈ L * (nn0 + ni0))
+  @test all(isapprox(yp, yn, rtol=1e-1))
   # early time linear solution
   A = 1
   B = min(20, length(t))
@@ -52,7 +50,5 @@ using IonisationToy, QuadGK, Test, LinearFitXYerrors
   A = B ÷ 2
   fit = linearfitxy(t[A:B], log.(yp[A:B]))
   slope = fit.b
-  @show slope, Riz, ni0, nn0
   @test isapprox(slope, - Riz * (ni0 + nn0), rtol=1e-2)
- 
 end
