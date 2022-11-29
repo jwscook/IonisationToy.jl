@@ -1,6 +1,6 @@
 module IonisationToy
 
-using Polyester, LoopVectorization, Base.Threads
+using Polyester, LoopVectorization, Base.Threads, ProgressMeter
 
 struct Grid
   dx::Float64
@@ -125,7 +125,7 @@ function simulation(grid::Grid, neutralparticles::Vector{Particle}; dt=1.0, Riz=
     leftboundarysource::L=nothing, rightboundarysource::R=nothing) where {L, R}
   checkpoints = []
   push!(checkpoints, (deepcopy(grid),deepcopy(neutralparticles))) # push IC
-  for i in 1:iters
+  @showprogress 0.1 "Simulating..." for i in 1:iters
     externalsources!(neutralparticles, grid, i * dt, dt;
       vth=vth, sourcedensity=sourcedensity, npartperbc=npartperbc,
       leftboundarysource=leftboundarysource, rightboundarysource=rightboundarysource)
@@ -133,7 +133,6 @@ function simulation(grid::Grid, neutralparticles::Vector{Particle}; dt=1.0, Riz=
     ionise!(grid, neutralparticles, dt, Riz)
     sink!(grid, bulkionsinkrate, dt)
     (i % checkpointevery == 0) && push!(checkpoints, (deepcopy(grid),deepcopy(neutralparticles)))
-    (i % checkpointevery == 0) && @info "iteration $i out of $iters."
   end
   return checkpoints
 end

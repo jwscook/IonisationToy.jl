@@ -1,16 +1,17 @@
-using IonisationToy, QuadGK, Test, LinearFitXYerrors
+using IonisationToy, QuadGK, Test, LinearFitXYerrors, Random
+Random.seed!(0)
 
 @testset "Integration Test 0" begin
   L = 1.0 + rand()
   NG = 128
-  ni0 = 2 + 3 * rand()
-  nn0 = 3 + 2 * rand()
+  @show ni0 = 2 + 3rand()
+  @show nn0 = 3 + 2rand()
 
-  NP = 2^14
+  NP = 2^11
   Riz = 1/pi#0.5 + rand()
 
-  iters = 1000
-  dt = Riz * nn0 / 400
+  iters = 4000
+  dt = Riz * sqrt(nn0^2 + ni0^2) / 200
 
   neutraldensityic(x) = 0.0
   iondensityic(x) = ni0
